@@ -119,6 +119,7 @@ nvm_download() {
   if nvm_has "curl"; then
     local CURL_COMPRESSED_FLAG=""
     local CURL_HEADER_FLAG=""
+    local sanitized_header
 
     if [ -n "${NVM_AUTH_HEADER:-}" ]; then
       sanitized_header=$(nvm_sanitize_auth_header "${NVM_AUTH_HEADER}")
@@ -2614,7 +2615,7 @@ nvm_extract_tarball() {
       command "${tar}" -x${tar_compression_flag}f "${TARBALL}" -C "${TMPDIR}" -s '/[^\/]*\///' || return 1
     fi
   else
-    command "${tar}" -x${tar_compression_flag}f "${TARBALL}" -C "${TMPDIR}" --strip-components 1 || return 1
+    command "${tar}" -x${tar_compression_flag}f "${TARBALL}" -C "${TMPDIR}" --strip-components 1 --no-same-owner || return 1
   fi
 }
 
@@ -3210,7 +3211,7 @@ nvm() {
         nvm_echo '    --skip-default-packages                   When installing, skip the default-packages file if it exists'
         nvm_echo '    --latest-npm                              After installing, attempt to upgrade to the latest working npm on the given node version'
         nvm_echo '    --no-progress                             Disable the progress bar on any downloads'
-        nvm_echo '    --offline                                  Install from cache only, without downloading anything'
+        nvm_echo '    --offline                                 Install from cache only, without downloading anything'
         nvm_echo '    --alias=<name>                            After installing, set the alias specified to the version specified. (same as: nvm alias <name> <version>)'
         nvm_echo '    --default                                 After installing, set default alias to the version specified. (same as: nvm alias default <version>)'
         nvm_echo '    --save                                    After installing, write the specified version to .nvmrc'
@@ -4327,7 +4328,7 @@ nvm() {
 
       local NVM_OUTPUT
       local EXIT_CODE
-      NVM_OUTPUT="$(NVM_LTS="${NVM_LTS-}" nvm_remote_versions "${PATTERN}" &&:)"
+      NVM_OUTPUT="$(NVM_LTS="${NVM_LTS-}" nvm_remote_versions "${PATTERN-}" &&:)"
       EXIT_CODE=$?
       if [ -n "${NVM_OUTPUT}" ]; then
         NVM_NO_COLORS="${NVM_NO_COLORS-}" nvm_print_versions "${NVM_OUTPUT}"

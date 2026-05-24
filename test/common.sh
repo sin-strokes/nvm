@@ -28,14 +28,14 @@ assert_ok() {
   local FUNCTION=$1
   shift
 
-  $($FUNCTION $@) || die '"'"$FUNCTION $@"'" should have succeeded, but failed'
+  "$FUNCTION" "$@" || die '"'"$FUNCTION $@"'" should have succeeded, but failed'
 }
 
 assert_not_ok() {
   local FUNCTION=$1
   shift
 
-  ! $($FUNCTION $@) || die '"'"$FUNCTION $@"'" should have failed, but succeeded'
+  ! "$FUNCTION" "$@" || die '"'"$FUNCTION $@"'" should have failed, but succeeded'
 }
 
 strip_colors() {
@@ -46,7 +46,7 @@ strip_colors() {
 
 make_echo() {
   echo "#!/bin/sh" > "$1"
-  echo "echo \"${2}\"" > "$1"
+  echo "echo \"${2}\"" >> "$1"
   chmod a+x "$1"
 }
 
