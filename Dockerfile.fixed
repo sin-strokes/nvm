@@ -1,0 +1,33 @@
+FROM ubuntu:latest
+
+# Install dependencies
+RUN apt update && apt install -y curl bash ca-certificates
+
+# Use bash for the shell with proper options
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# Create a script file sourced by both interactive and non-interactive bash shells
+# CRITICAL FIX: Use "${HOME}/.bash_env" instead of ~/.bash_env
+# This ensures proper variable expansion in non-interactive shells
+ENV BASH_ENV "${HOME}/.bash_env"
+RUN touch "${BASH_ENV}"
+RUN echo '. "${BASH_ENV}"' >> ~/.bashrc
+
+# Download and install nvm
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | PROFILE="${BASH_ENV}" bash
+
+# Set up environment variables for nvm
+ENV NVM_DIR /root/.nvm
+ENV PATH $NVM_DIR/versions/node/v18/bin:$NVM_DIR/bin:$PATH
+
+# Verify nvm installation
+RUN bash -c "source $NVM_DIR/nvm.sh && nvm --version"
+
+# Install Node.js version 18
+RUN bash -c "source $NVM_DIR/nvm.sh && nvm install 18 && nvm alias default 18"
+
+# Test Node and npm
+RUN node --version && npm --version
+
+ENTRYPOINT ["bash", "-c", "source $NVM_DIR/nvm.sh && exec \"$@\"", "--"]
+CMD ["/bin/bash"]
