@@ -22,7 +22,7 @@ ENV SHELLCHECK_VERSION=0.7.0
 
 # Pick a Ubuntu apt mirror site for better speed
 # ref: https://launchpad.net/ubuntu/+archivemirrors
-ENV UBUNTU_APT_SITE ubuntu.cs.utah.edu
+ENV UBUNTU_APT_SITE archive.ubuntu.com
 
 # Replace origin apt package site with the mirror site
 RUN sed -E -i "s/([a-z]+.)?archive.ubuntu.com/$UBUNTU_APT_SITE/g" /etc/apt/sources.list
